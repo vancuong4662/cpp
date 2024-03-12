@@ -36,17 +36,28 @@ void vectorCopy(vector<int>& a, const vector<int>& b) {
     copy(b.begin(), b.end(), back_inserter(a));
 }
 
+bool VectorCheckIn(const vector<int>& vec, int number) {
+    auto it = find(vec.begin(), vec.end(), number);
+    return it != vec.end();
+}
+
 // Hàm biến đổi dãy số
-bool transform(vector<int>& numbers, vector<int> origins, int& transformations) {
+void transform(vector<int>& numbers, int& transformations) {
+    
+    vector<int>origins;
+    vectorCopy(origins,numbers);
+    
+    vector<int>checkeds;
     
     cout<<"Ori ";
-    printVector(numbers);
+    printVector(origins);
+    
     int n = numbers.size();
     for (int i = 0; i < n; ++i) {
-        cout << "Bat dau voi day ";
-        printVector(numbers);
+        if (VectorCheckIn(numbers,i)) continue;
         for (int j = i + 1; j < n; ++j) {
             if (i == j) continue;
+            if (VectorCheckIn(numbers,j)) continue;
             int a = numbers[i];
             int b = numbers[j];
             for (int k = 2; k < min(a, b); ++k) {
@@ -56,14 +67,26 @@ bool transform(vector<int>& numbers, vector<int> origins, int& transformations) 
                     numbers[i] = a / k;
                     numbers[j] = b * k;
                     ++transformations;
+                    cout<<"Transform to ";
                     printVector(numbers);
                     
-                    cout << "________\n";
-                    vectorCopy(numbers,origins);
-                    cout<<"reset ";
-                    printVector(numbers);
-                    
-                    return true;
+                    int checkGCD = greatestCommonDivisor(numbers);
+                    if (checkGCD != 1) {
+                        cout<<"Final ";
+                        printVector(numbers);
+                        return; // Thỏa mãn, kết thúc
+                    } else {
+                        cout<<"GCD is 1. Continue to transform";
+                        checkeds.push_back(i);
+                        checkeds.push_back(j);
+                        cout<<"Checked position ";
+                        printVector(checkeds);
+                        
+                        if (checkeds.size() == numbers.size()) {
+                            cout<<"\nNot found any result";
+                        }
+                        return;
+                    }
                 }
             }
         }
@@ -91,12 +114,13 @@ int main() {
     vector<int> numbers = {4,5,6,7,8};
     int transformations = 0;
     
-    vector<int>origins;
-    vectorCopy(origins,numbers);
+    
 
     // Biến đổi dãy số
-    while (transform(numbers, origins, transformations)) {}
-    cout << "Hello ? "  << endl;
+    transform(numbers, transformations);
+    cout << "Finish transforming"  << endl;
+    
+    
 
     // Tìm ước chung lớn nhất
     int gcd = greatestCommonDivisor(numbers);
